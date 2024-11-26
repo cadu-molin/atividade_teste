@@ -1,26 +1,31 @@
 package prova;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 public class Calculator {
-    public static double calculateInvoice(List<Product> products, Double discount) {
+    public static BigDecimal calculateInvoice(List<Product> products, BigDecimal discount) {
 
-        //Lança um InvalidProductException caso encontre um produto com preço ou qauntidade menor que zero
-        if (products.stream().anyMatch(product -> product.getPrice() < 0 || product.getQuantity() < 0)) {
+        // Lança um InvalidProductException caso encontre um produto com preço ou quantidade menor que zero
+        if (products.stream().anyMatch(product -> product.getPrice().compareTo(BigDecimal.ZERO) < 0 || product.getQuantity() < 0)) {
             throw new InvalidProductException("Produto com preço ou quantidade inválidos.");
         }
 
-        //Soma o resultado da multiplicação entre preço e quantidade por produto
-        Double total = products.stream().reduce(0.0, (subtotal, product) -> subtotal + (product.getPrice() * product.getQuantity()), Double::sum);
+        // Soma o resultado da multiplicação entre preço e quantidade por produto
+        BigDecimal total = products.stream()
+                .map(product -> product.getPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        //Aplica o desconto repebido por parametro
-        Double discountedTotal = total * (1 - discount);
+        // Aplica o desconto recebido por parâmetro
+        BigDecimal discountedTotal = total.multiply(BigDecimal.ONE.subtract(discount));
 
-        //Caso o total seja maior que R$1.000, será aplicado um desconto de R$100
-        if (total > 1000) {
-            discountedTotal -= 100;
+        // Caso o total seja maior que R$1000 será aplicado um desconto adicional de R$100
+        if (total.compareTo(BigDecimal.valueOf(1000)) > 0) {
+            discountedTotal = discountedTotal.subtract(BigDecimal.valueOf(100));
         }
 
-        return discountedTotal;
+        // Garante que o valor final tenha apenas duas casas decimais, arredondando corretamente
+        return discountedTotal.setScale(2, RoundingMode.HALF_UP);
     }
 }

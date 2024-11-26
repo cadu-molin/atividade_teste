@@ -1,11 +1,13 @@
 package prova;
 
+import java.math.BigDecimal;
+
 public class Product {
     private String name;
-    private Double price;
+    private BigDecimal price;
     private Integer quantity;
 
-    public Product(String name, Double price, Integer quantity) {
+    public Product(String name, BigDecimal price, Integer quantity) {
         this.name = name;
         this.price = price;
         this.quantity = quantity;
@@ -19,11 +21,11 @@ public class Product {
         this.name = name;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
